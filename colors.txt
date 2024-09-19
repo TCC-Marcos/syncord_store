@@ -1,0 +1,5 @@
+#565659 - cinza +
+#0583F2 - Azul +
+#0597F2 - Azul 
+#57B7F2 - Azul -
+#F2F2F2 - cinza -
