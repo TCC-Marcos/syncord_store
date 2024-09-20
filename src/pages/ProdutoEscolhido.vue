@@ -1,7 +1,7 @@
 <template>
   <div class="q-my-xl row justify-center q-gutter-md">
     <div class="col-xs-10 col-md-4 col-lg-4">
-      <q-img src="/img/1.jpg"/>
+      <q-img src="img/1.jpg"/>
     </div>
     <div class="col-xs-11 col-md-5 col-lg-5 infoproduto">
       <div class="row q-mx-lg q-pb-lg q-mb-lg">
@@ -55,7 +55,7 @@
         >
           <template v-slot:item="props">
             <div class="q-pa-xs q-ma-lg-xs col-xs-12 col-sm-6 col-md-3 col-lg-2">
-              <a href="produto">
+              <router-link :to="{name: 'produto'}">
                 <q-card flat bordered>
                   <img class="flex" :src= "`/img/${props.row.id}.jpg`">
                   <q-card-section class="">
@@ -65,7 +65,7 @@
                     <p>Frete gratis</p>
                   </q-card-section>
                 </q-card>
-              </a>
+              </router-link>
             </div>
           </template>
         </q-table>
