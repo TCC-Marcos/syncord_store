@@ -55,9 +55,9 @@
         >
           <template v-slot:item="props">
             <div class="q-pa-xs q-ma-lg-xs col-xs-12 col-sm-6 col-md-3 col-lg-2">
-              <router-link :to="{name: 'produto'}">
+              <router-link :to="{name: 'produto', params: {id: props.row.id}}">
                 <q-card flat bordered>
-                  <img class="flex" :src= "`/img/${props.row.id}.jpg`">
+                  <img class="flex" :src= "`img/${props.row.id}.jpg`">
                   <q-card-section class="">
                     <br>
                     <strong class="description">{{ props.row.description }}</strong>
