@@ -41,7 +41,7 @@
     <div class="col-9 items-center">
       <div class="text-h4 q-pb-lg">Outros produtos</div>
         <q-table
-          class="q-pb-lg items-center"
+          class="q-pb-lg q-justify-center"
           grid
           flat bordered
           :card-container-class="cardContainerClass"
@@ -54,9 +54,9 @@
           v-model:pagination="pagination"
         >
           <template v-slot:item="props">
-            <div class="q-pa-xs q-ma-lg-xs col-xs-12 col-sm-6 col-md-3 col-lg-2">
+            <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
               <router-link :to="{name: 'produto', params: {id: props.row.id}}">
-                <q-card flat bordered>
+                <q-card flat bordered class="q-mx-md q-my-md">
                   <img class="flex" :src= "`img/${props.row.id}.jpg`">
                   <q-card-section class="">
                     <br>
@@ -107,7 +107,7 @@ export default {
       if ($q.screen.lt.lg) {
         return 4
       }
-      return 5
+      return 4
     }
 
     const filter = ref('')
