@@ -3,8 +3,8 @@ import { api } from 'src/boot/axios'
 export default function useApi (url) {
   const list = async () => {
     try {
-      const response = await api.get(url)
-      return response.data
+      const { data } = await api.get(url)
+      return data
     } catch (error) {
       throw new Error(error)
     }
@@ -36,10 +36,20 @@ export default function useApi (url) {
       throw new Error(error)
     }
   }
+  const listById = async (id) => {
+    try {
+      const { data } = await api.get(`${url}/${id}`)
+      return data
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
   return {
     list,
     post,
     update,
-    remove
+    remove,
+    listById
   }
 }

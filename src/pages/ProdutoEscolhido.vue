@@ -1,23 +1,23 @@
 <template>
   <div class="q-my-xl row justify-center q-gutter-md">
     <div class="col-xs-10 col-md-4 col-lg-4">
-      <q-img src="img/1.jpg"/>
+      <q-img :src="`/img/${produtoDestaque.id}.jpg`"/>
     </div>
     <div class="col-xs-11 col-md-5 col-lg-5 infoproduto">
       <div class="row q-mx-lg q-pb-lg q-mb-lg">
-          <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">Apple iPhone 15 256GB Preto 5G Tela 6,1" Câm. Traseira 48+12MP Frontal 12MP</p>
-          <p class="q-px-sm text-caption">Cod: KL3J23</p>
+          <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{produtoDestaque.descricao}}</p>
+          <p class="q-px-sm text-caption">Cod: {{produtoDestaque.cod_produto}}</p>
       </div>
       <div class="row items-center q-pt-lg">
         <q-card flat style="background-color: #F2F2F2" class=" q-ml-md my-card">
           <q-card-section>
             <div class="col row ">
                <p class="text-subtitle1 q-mb-xs ">De:</p>
-               <div class="text-subtitle1 q-mb-xs text-strike">R$ 8.239,19</div>
+               <div class="text-subtitle1 q-mb-xs text-strike">{{ produtoDestaque.preco ? produtoDestaque.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}}</div>
             </div>
             <div class="col row">
               <p class="q-mb-xs text-h5">Por: </p>
-              <p class="q-px-xs q-mb-xs text-h4 text-weight-bolder" style="color: green;">R$ 7.415,27</p>
+              <p class="q-px-xs q-mb-xs text-h4 text-weight-bolder" style="color: green;">{{ produtoDestaque.preco ? (produtoDestaque.preco * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '' }}</p>
             </div>
             <div>
               <p class="text-subtitle2">À vista no PIX 10% desconto</p>
@@ -46,7 +46,7 @@
           flat bordered
           :card-container-class="cardContainerClass"
           title=""
-          :rows="rows"
+          :rows="produtos"
           :columns="columns"
           row-key="name"
           hide-header
@@ -57,11 +57,11 @@
             <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
               <router-link :to="{name: 'produto', params: {id: props.row.id}}">
                 <q-card flat bordered class="q-mx-md q-my-md">
-                  <img class="flex" :src= "`img/${props.row.id}.jpg`">
+                  <q-img class="flex" :src= "`/img/${props.row.id}.jpg`"/>
                   <q-card-section class="">
                     <br>
-                    <strong class="description">{{ props.row.description }}</strong>
-                    <h6 class="q-my-md">R$ {{props.row.price}}</h6>
+                    <strong class="description">{{ props.row.descricao }}</strong>
+                    <h6 class="q-my-md">{{ props.row.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
                     <p>Frete gratis</p>
                   </q-card-section>
                 </q-card>
@@ -75,30 +75,47 @@
 
 <script>
 import { useQuasar } from 'quasar'
-import { ref, watch } from 'vue'
-
-const deserts = [
-  'Apple iPhone 15 256GB Preto 5G Tela 6,1" Câm. Traseira 48+12MP Frontal 12MP',
-  'Processador AMD Ryzen 5 7600X 4.7GHz/ 5.3GHz Hexa-Core 38MB AM5 - 100-100000593WOF',
-  'ROTEADOR TP-LINK AC1350 ARCHER C60',
-  'Sony Play Station 5 Com 2 controles',
-  'Placa de Vídeo Gigabyte NVIDIA GeForce RTX 4060 Gaming OC, 8G, 8GB, GDDR6, DLSS, Ray Tracing',
-  'Kingston Memória Ram Fury Renegade Rgb 1x16gb DDR5 7200mhz Colorido',
-  'Microsoft Xbox Series X 1TB Standard - Preto',
-  'Controle Microsoft Xbox Carbon Black, Sem Fio, Para Xbox Series X e S, Preto',
-  'Controle Microsoft Xbox Carbon Black, Sem Fio, Para Xbox Series X e S, Preto',
-  'Controle Microsoft Xbox Carbon Black, Sem Fio, Para Xbox Series X e S, Preto'
-]
-const rows = []
-
-let i = 1
-deserts.forEach(name => {
-  rows.push({ id: i++, description: name, price: 8239.19 })
-})
+import { ref, watch, onMounted } from 'vue'
+import produtosService from 'src/services/produtos'
+import { useRoute } from 'vue-router'
 
 export default {
   setup () {
     const $q = useQuasar()
+    const produtos = ref([])
+    const produtoDestaque = ref([])
+    const { list } = produtosService()
+    const { listById } = produtosService()
+    const route = useRoute()
+    const id = route.params.id
+
+    onMounted(() => {
+      getProduto(id)
+      getProdutos()
+    })
+
+    watch(() => route.params.id, (newId) => {
+      getProduto(newId)
+    })
+
+    const getProdutos = async () => {
+      try {
+        const data = await list()
+        console.log(data)
+        produtos.value = data
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const getProduto = async (produtoId = id) => {
+      try {
+        const data = await listById(produtoId)
+        produtoDestaque.value = data
+      } catch (error) {
+        console.error(error)
+      }
+    }
 
     function getItemsPerPage () {
       if ($q.screen.lt.sm) {
@@ -120,7 +137,8 @@ export default {
       pagination.value.rowsPerPage = getItemsPerPage()
     })
     return {
-      rows,
+      produtos,
+      produtoDestaque,
 
       filter,
       pagination,
