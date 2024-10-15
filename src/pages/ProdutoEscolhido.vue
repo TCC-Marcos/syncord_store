@@ -4,11 +4,13 @@
     <q-img :src="`/img/${produtoDestaque.id}.jpg`" />
   </div>
   <div class="col-xs-11 col-md-5 col-lg-5 infoproduto">
-    <div class="row q-mx-lg">
-      <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{ produtoDestaque.descricao }}</p>
-    </div>
-    <div class="row q-mx-lg q-pb-lg q-mb-lg">
-      <p class="q-my-xs text-caption">Cod: {{ produtoDestaque.cod_produto }}</p>
+    <div class="nomeproduto">
+      <div class="row q-mx-lg">
+        <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{ produtoDestaque.descricao }}</p>
+      </div>
+      <div class="row q-mx-lg q-pb-lg q-mb-lg">
+        <p class="q-my-xs text-caption">Cod: {{ produtoDestaque.cod_produto }}</p>
+      </div>
     </div>
     <div class="row justify-between items-center q-pt-lg q-mt-lg">
       <q-card flat class="q-ml-md my-card" style="background-color: #F2F2F2">
@@ -29,11 +31,12 @@
           <q-icon name="shopping_cart" />
           Comprar
         </q-btn>
-        <q-btn class="text-subtitle2 q-mb-md q-mx-md" color="primary">
+        <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque)" color="primary">
           <q-icon name="add_shopping_cart" />
         </q-btn>
       </div>
     </div>
+    <pre> {{ cart }} </pre>
   </div>
 </div>
 
@@ -78,14 +81,15 @@ import { useQuasar } from 'quasar'
 import { ref, watch, onMounted, computed } from 'vue'
 import produtosService from 'src/services/produtos'
 import { useRoute } from 'vue-router'
+import { useCart } from 'src/composables/UseCart'
 
 export default {
   setup () {
     const $q = useQuasar()
     const produtos = ref([])
     const produtoDestaque = ref([])
-    const { list } = produtosService()
-    const { listById } = produtosService()
+    const { list, listById } = produtosService()
+    const { addCart, cart } = useCart()
     const route = useRoute()
     const id = route.params.id
 
@@ -109,7 +113,6 @@ export default {
     const getProdutos = async () => {
       try {
         const data = await list()
-        console.log(data)
         produtos.value = data
       } catch (error) {
         console.error(error)
@@ -149,6 +152,8 @@ export default {
       produtoDestaque,
       precoDesconto,
       precoOriginal,
+      addCart,
+      cart,
 
       filter,
       pagination,
@@ -164,8 +169,10 @@ export default {
   background-color: #F2F2F2
   border-radius: 1em
 .my-card
-  width: 100%
-  max-width: 250px
+  width: 50%
+  max-width: 500px
+.nomeproduto
+  height: 30%
 a
   text-decoration: none
   color: black

@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          <a href="/" style="text-decoration: none; color: #F2F2F2">Syncord Store</a>
+          <router-link :to="{ name: 'home' }" style="text-decoration: none; color: #F2F2F2">Syncord Store</router-link>
         </q-toolbar-title>
 
         <div>
