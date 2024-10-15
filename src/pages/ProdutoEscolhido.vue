@@ -1,42 +1,42 @@
 <template>
-  <div class="q-my-xl row justify-center q-gutter-md">
-    <div class="col-xs-10 col-md-4 col-lg-4">
-      <q-img :src="`/img/${produtoDestaque.id}.jpg`"/>
+ <div class="q-my-xl row justify-center q-gutter-md">
+  <div class="col-xs-10 col-md-4 col-lg-3">
+    <q-img :src="`/img/${produtoDestaque.id}.jpg`" />
+  </div>
+  <div class="col-xs-11 col-md-5 col-lg-5 infoproduto">
+    <div class="row q-mx-lg">
+      <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{ produtoDestaque.descricao }}</p>
     </div>
-    <div class="col-xs-11 col-md-5 col-lg-5 infoproduto">
-      <div class="row q-mx-lg q-pb-lg q-mb-lg">
-          <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{produtoDestaque.descricao}}</p>
-          <p class="q-px-sm text-caption">Cod: {{produtoDestaque.cod_produto}}</p>
-      </div>
-      <div class="row items-center q-pt-lg">
-        <q-card flat style="background-color: #F2F2F2" class=" q-ml-md my-card">
-          <q-card-section>
-            <div class="col row ">
-               <p class="text-subtitle1 q-mb-xs ">De:</p>
-               <div class="text-subtitle1 q-mb-xs text-strike">{{ produtoDestaque.preco ? produtoDestaque.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''}}</div>
-            </div>
-            <div class="col row">
-              <p class="q-mb-xs text-h5">Por: </p>
-              <p class="q-px-xs q-mb-xs text-h4 text-weight-bolder" style="color: green;">{{ produtoDestaque.preco ? (produtoDestaque.preco * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : '' }}</p>
-            </div>
-            <div>
-              <p class="text-subtitle2">À vista no PIX 10% desconto</p>
-            </div>
-          </q-card-section>
-        </q-card>
-        <div class="col row justify-center q-mr-md">
-          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" color="primary">
-            <q-icon name="shopping_cart"/>
-            Comprar
-          </q-btn>
-          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" color="primary">
-            <q-icon name="shopping_cart"/>
-            <q-icon name="add"/>
-          </q-btn>
-        </div>
+    <div class="row q-mx-lg q-pb-lg q-mb-lg">
+      <p class="q-my-xs text-caption">Cod: {{ produtoDestaque.cod_produto }}</p>
+    </div>
+    <div class="row justify-between items-center q-pt-lg q-mt-lg">
+      <q-card flat class="q-ml-md my-card" style="background-color: #F2F2F2">
+        <q-card-section>
+          <div class="row">
+            <p class="text-subtitle1 q-mb-xs">De: </p>
+            <div class="text-subtitle1 q-mb-xs text-strike">{{ precoOriginal }}</div>
+          </div>
+          <div class="row">
+            <p class="q-mb-xs text-h5">Por: </p>
+            <p class="q-px-xs q-mb-xs text-h4 text-weight-bolder text-green">{{ precoDesconto }}</p>
+          </div>
+          <p class="text-subtitle2">À vista no PIX 10% desconto</p>
+        </q-card-section>
+      </q-card>
+      <div class="col-auto q-mr-md">
+        <q-btn class="text-subtitle2 q-mb-md q-ml-lg" :to="{ name: 'carrinho' }" color="primary">
+          <q-icon name="shopping_cart" />
+          Comprar
+        </q-btn>
+        <q-btn class="text-subtitle2 q-mb-md q-mx-md" color="primary">
+          <q-icon name="add_shopping_cart" />
+        </q-btn>
       </div>
     </div>
   </div>
+</div>
+
   <div class="row justify-center">
     <div class="col-9 items-center">
       <div class="text-h4 q-pb-lg">Outros produtos</div>
@@ -55,7 +55,7 @@
         >
           <template v-slot:item="props">
             <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
-              <router-link :to="{name: 'produto', params: {id: props.row.id}}">
+              <router-link :to="{ name: 'produto', params: {id: props.row.id} }">
                 <q-card flat bordered class="q-mx-md q-my-md">
                   <q-img class="flex" :src= "`/img/${props.row.id}.jpg`"/>
                   <q-card-section class="">
@@ -75,7 +75,7 @@
 
 <script>
 import { useQuasar } from 'quasar'
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import produtosService from 'src/services/produtos'
 import { useRoute } from 'vue-router'
 
@@ -88,6 +88,14 @@ export default {
     const { listById } = produtosService()
     const route = useRoute()
     const id = route.params.id
+
+    const precoOriginal = computed(() => {
+      return produtoDestaque.value.preco ? produtoDestaque.value.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''
+    })
+
+    const precoDesconto = computed(() => {
+      return produtoDestaque.value.preco ? (produtoDestaque.value.preco * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''
+    })
 
     onMounted(() => {
       getProduto(id)
@@ -139,6 +147,8 @@ export default {
     return {
       produtos,
       produtoDestaque,
+      precoDesconto,
+      precoOriginal,
 
       filter,
       pagination,
