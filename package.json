@@ -23,7 +23,8 @@
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.19.1",
     "eslint-plugin-n": "^15.0.0",
-    "eslint-plugin-promise": "^6.0.0"
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-vue": "^9.29.0"
   },
   "engines": {
     "node": "^18 || ^16 || ^14.19",

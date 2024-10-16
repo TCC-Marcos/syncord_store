@@ -58,6 +58,7 @@ module.exports = {
     'one-var': 'off',
     'no-void': 'off',
     'multiline-ternary': 'off',
+    'vue/no-v-model-argument': 'off',
 
     'import/first': 'off',
     'import/named': 'error',

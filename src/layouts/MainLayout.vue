@@ -16,7 +16,7 @@
         </q-toolbar-title>
 
         <div>
-          <q-btn flat round color="#F2F2F2" icon="shopping_cart" to="tabela"/>
+          <q-btn flat round color="#F2F2F2" icon="shopping_cart" :to="{ name: 'carrinho'}"/>
           <q-btn flat round color="#F2F2F2" icon="person" to="tabela"/>
         </div>
       </q-toolbar>

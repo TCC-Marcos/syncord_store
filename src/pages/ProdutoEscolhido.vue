@@ -32,7 +32,7 @@
             <q-icon name="shopping_cart" />
             Comprar
           </q-btn>
-          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque)" color="primary">
+          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque.id)" color="primary">
             <q-icon name="add_shopping_cart" />
           </q-btn>
         </div>
