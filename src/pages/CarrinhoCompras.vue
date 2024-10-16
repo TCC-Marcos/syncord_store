@@ -14,25 +14,34 @@
         :done="step > 1"
       >
         <div class="row justify-center q-gutter-md">
-          <div class="col-7 produtos">
+          <div class="col-md-7 col-lg-8 produtos">
             <div class="row q-pa-md q-gutter-sm" v-for="produto in cart" :key="produto.id">
-              <div class="col-2">
-                <q-img class="" :src="`/img/${produto.id}.jpg`" style="height: 100px; max-width: 100px"/>
+              <div class="col-md-2 col-lg-1" >
+                <q-img class="" :src="`/img/${produto.id}.jpg`" style=""/>
               </div>
               <div class="col-5">
-                <div class="column">
-                  <strong  class=" text-subtitle1 descricao">{{ produto.descricao }}</strong>
+                <div class="q-ma-sm column">
+                  <strong  class="text-subtitle2 descricao">{{ produto.descricao }}</strong>
+                  <p>Preço </p>
                 </div>
               </div>
-              <div class="col-2">
-                <q-btn class="" flat label="-"/><strong class="q-mt-sm">{{ produto.quantidade }}</strong><q-btn class="" flat label="+"/>
+              <div class="col-3">
+                  <div class="row justify-center">
+                    <q-btn class="" flat icon="chevron_left"/>
+                    <q-input borderless class="q-ml-sm" v-model="produto.quantidade" style="max-width: 20px;"/>
+                    <q-btn class="" flat icon="chevron_right"/>
+                  </div>
+                  <div class="row justify-center">
+                  </div>
               </div>
-              <div class="col-2">
-                <strong class="q-mt-sm">{{ produto.preco*produto.quantidade }}</strong>
+              <div class="col-md-1 col-lg-2" >
+                <div class="row justify-end">
+                  <strong class="q-mt-sm">{{ (produto.preco*produto.quantidade).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</strong>
+                </div>
               </div>
             </div>
           </div>
-          <div class="col-4">
+          <div class="col-md-4 col-lg-3">
 
           </div>
         </div>
