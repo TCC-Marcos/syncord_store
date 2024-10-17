@@ -28,11 +28,11 @@
           </q-card-section>
         </q-card>
         <div class="col-auto q-mr-md">
-          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" :to="{ name: 'carrinho' }" color="primary">
+          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" @click="addCart(produtoDestaque.id, produtoDestaque.estoque)" :to="{ name: 'carrinho' }" color="primary">
             <q-icon name="shopping_cart" />
             Comprar
           </q-btn>
-          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque.id)" color="primary">
+          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque.id, produtoDestaque.estoque)" color="primary">
             <q-icon name="add_shopping_cart" />
           </q-btn>
         </div>

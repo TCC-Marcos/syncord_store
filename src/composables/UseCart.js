@@ -4,13 +4,17 @@ import { ref } from 'vue'
 const cart = ref([])
 
 export const useCart = () => {
-  function addCart (id) {
+  function addCart (id, estoque) {
     try {
       const itemInCart = cart.value.find(o => o.id === id)
       if (itemInCart) {
-        itemInCart.quantidade += 1
+        if (itemInCart.quantidade < estoque) {
+          itemInCart.quantidade += 1
+        }
       } else {
-        cart.value.push({ id: id, quantidade: 1 })
+        if (estoque > 0) {
+          cart.value.push({ id, quantidade: 1 })
+        }
       }
     } catch (error) {
       console.error(error)
@@ -26,11 +30,11 @@ export const useCart = () => {
     }
   }
 
-  function increQuant (id) {
+  function increQuant (id, estoque) {
     try {
       const itemInCart = cart.value.find(o => o.id === id)
-      if (itemInCart.quantidade < itemInCart.estoque) {
-        itemInCart.quantidade = +itemInCart.quantidade + 1
+      if (itemInCart.quantidade < estoque) {
+        itemInCart.quantidade = Number(itemInCart.quantidade) + 1
       }
     } catch (error) {
       console.error(error)
@@ -41,17 +45,21 @@ export const useCart = () => {
     try {
       const itemInCart = cart.value.find(o => o.id === id)
       if (itemInCart.quantidade > 1) {
-        itemInCart.quantidade = -itemInCart.quantidade - 1
+        itemInCart.quantidade = Number(itemInCart.quantidade) - 1
       }
     } catch (error) {
       console.error(error)
     }
   }
 
-  function setQuant (id, qtde) {
+  function setQuant (id, qtde, estoque) {
     try {
       const itemInCart = cart.value.find(o => o.id === id)
-      itemInCart.quantidade = qtde
+      if (qtde <= estoque) {
+        itemInCart.quantidade = Number(qtde)
+      } else {
+        itemInCart.quantidade = Number(estoque)
+      }
     } catch (error) {
 
     }
