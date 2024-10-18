@@ -27,7 +27,7 @@
             <p class="text-subtitle2">À vista no PIX 10% desconto</p>
           </q-card-section>
         </q-card>
-        <div class="col-auto q-mr-md">
+        <div class="col-auto q-mr-md"  v-if="produtoDestaque.estoque > 0">
           <q-btn class="text-subtitle2 q-mb-md q-ml-lg" @click="addCart(produtoDestaque.id, produtoDestaque.estoque)" :to="{ name: 'carrinho' }" color="primary">
             <q-icon name="shopping_cart" />
             Comprar
@@ -35,6 +35,9 @@
           <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque.id, produtoDestaque.estoque)" color="primary">
             <q-icon name="add_shopping_cart" />
           </q-btn>
+        </div>
+        <div v-else>
+          <strong class="q-mr-lg text-h6 text-red">Fora de estoque</strong>
         </div>
       </div>
     </div>
