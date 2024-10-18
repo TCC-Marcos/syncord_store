@@ -1,0 +1,4 @@
+# escolher o que mostrar pelo tamanho da tela
+  v-if="$q.screen.gt.sm"
+  v-else
+#
