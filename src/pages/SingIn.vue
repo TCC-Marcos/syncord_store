@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div class="row justify-center" style=" width: 100%;">
-      <div class="col-3 q-pa-md form-login">
-        <q-input outlined v-model="user" label="Usuário"/>
+      <div class="col-3 q-pa-md q-mx-lg-lg form-login">
+        <strong class="q-ml-xs text-h5">Acesse sua conta</strong>
+        <q-input class="q-mt-md" outlined v-model="user" label="Usuário"/>
         <q-input class="q-mt-md" outlined v-model="password" label="Senha" :type="isPwd ? 'password' : 'text'"  >
           <template v-slot:append>
             <q-icon
@@ -12,7 +13,13 @@
             />
           </template>
         </q-input>
-        <div class="q-ma-xs">Esqueceu a senha?</div>
+        <div class="cursor-pointer q-ma-xs text-weight-light">Esqueceu a senha?</div>
+        <q-btn class="q-mt-lg" style="width: 100%; background-color: #0597F2; color: #F2F2F2">Entrar</q-btn>
+        <div class="row q-my-xs justify-center">
+          <router-link :to="{ name: 'singUp' }" class="text-subtitle1 text-weight-light singUp">
+            Criar conta
+          </router-link>
+        </div>
       </div>
     </div>
   </div>
@@ -35,8 +42,11 @@ export default {
   display: flex
   justify-content: center
   align-items: center
-  height: 50vh
+  height: 65vh
 .form-login
   background-color: #F2F2F2
   border-radius: 0.5em
+.singUp
+  color: inherit
+  text-decoration: none
 </style>

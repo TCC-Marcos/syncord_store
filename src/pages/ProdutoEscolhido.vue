@@ -28,11 +28,11 @@
           </q-card-section>
         </q-card>
         <div class="col-auto q-mr-md"  v-if="produtoDestaque.estoque > 0">
-          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" @click="addCart(produtoDestaque.id, produtoDestaque.estoque)" :to="{ name: 'carrinho' }" color="primary">
+          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" @click="addProductInCart(produtoDestaque.id, produtoDestaque.estoque)" :to="{ name: 'carrinho' }" color="primary">
             <q-icon name="shopping_cart" />
             Comprar
           </q-btn>
-          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addCart(produtoDestaque.id, produtoDestaque.estoque)" color="primary">
+          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addProductInCart(produtoDestaque.id, produtoDestaque.estoque)" color="primary">
             <q-icon name="add_shopping_cart" />
           </q-btn>
         </div>
@@ -123,7 +123,7 @@ export default {
       }
     }
 
-    const getProduto = async (produtoId = id) => {
+    const getProduto = async (produtoId) => {
       try {
         const data = await listById(produtoId)
         produtoDestaque.value = data
@@ -142,6 +142,22 @@ export default {
       return 4
     }
 
+    const addProductInCart = async (produtoId, estoque) => {
+      try {
+        const mensagem = addCart(produtoId, estoque)
+        mensagemCarrinho(mensagem)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    const mensagemCarrinho = (mensagem) => {
+      $q.notify({
+        type: mensagem.type,
+        message: mensagem.message
+      })
+    }
+
     const filter = ref('')
     const pagination = ref({
       page: 1,
@@ -155,6 +171,7 @@ export default {
       produtos,
       produtoDestaque,
       precoDesconto,
+      addProductInCart,
       precoOriginal,
       addCart,
 

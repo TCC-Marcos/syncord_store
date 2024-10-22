@@ -10,10 +10,14 @@ export const useCart = () => {
       if (itemInCart) {
         if (itemInCart.quantidade < estoque) {
           itemInCart.quantidade += 1
+          return { type: 'positive', message: 'Produto adicionado ao carrinho' }
+        } else {
+          return { type: 'negative', message: 'Número maximo adicionado' }
         }
       } else {
         if (estoque > 0) {
           cart.value.push({ id, quantidade: 1 })
+          return { type: 'positive', message: 'Produto adicionado ao carrinho' }
         }
       }
     } catch (error) {

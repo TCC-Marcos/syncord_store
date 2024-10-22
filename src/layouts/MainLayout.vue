@@ -16,8 +16,10 @@
         </q-toolbar-title>
 
         <div>
-          <q-btn flat round color="#F2F2F2" icon="shopping_cart" :to="{ name: 'carrinho'}"/>
-          <q-btn flat round color="#F2F2F2" icon="person" :to="{ name: 'login'}"/>
+          <q-btn flat round color="#F2F2F2" icon="shopping_cart" :to="{ name: 'carrinho'}">
+            <q-badge v-if="cart.length > 0" color="red" floating>{{ cart.length }}</q-badge>
+          </q-btn>
+          <q-btn flat round color="#F2F2F2" icon="person" :to="{ name: 'singIn'}"/>
         </div>
       </q-toolbar>
     </q-header>
@@ -51,6 +53,7 @@
 
 <script>
 import { defineComponent, ref } from 'vue'
+import { useCart } from 'src/composables/UseCart'
 import EssentialLink from 'components/EssentialLink.vue'
 
 const linksList = [
@@ -61,6 +64,8 @@ const linksList = [
     route: { name: 'home' }
   }
 ]
+
+const { cart } = useCart()
 
 export default defineComponent({
   name: 'MainLayout',
@@ -75,6 +80,7 @@ export default defineComponent({
     return {
       essentialLinks: linksList,
       leftDrawerOpen,
+      cart,
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }

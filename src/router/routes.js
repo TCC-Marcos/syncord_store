@@ -6,7 +6,8 @@ const routes = [
       { path: '', name: 'home', component: () => import('pages/IndexPage.vue') },
       { path: 'produto/:id?', name: 'produto', component: () => import('pages/ProdutoEscolhido.vue') },
       { path: 'carrinho', name: 'carrinho', component: () => import('pages/CarrinhoCompras.vue') },
-      { path: 'login', name: 'login', component: () => import('pages/SingIn.vue') }
+      { path: 'singIn', name: 'singIn', component: () => import('pages/SingIn.vue') },
+      { path: 'singUp', name: 'singUp', component: () => import('pages/SingUp.vue') }
     ]
   },
 
