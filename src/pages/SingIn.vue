@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="row justify-center" style=" width: 100%;">
+    <div class="row justify-center form-row">
       <div class="col-3 q-pa-md q-mx-lg-lg form-login">
         <strong class="q-ml-xs text-h5">Acesse sua conta</strong>
         <q-input class="q-mt-md" outlined v-model="user" label="Usuário"/>
@@ -42,11 +42,17 @@ export default {
   display: flex
   justify-content: center
   align-items: center
-  height: 65vh
+  height: 80vh
 .form-login
   background-color: #F2F2F2
   border-radius: 0.5em
+.form-row
+  width: 100%
+  @media (min-width: 1920px)
+    width: 80%
 .singUp
   color: inherit
   text-decoration: none
+  &:hover
+    color: #57B7F2
 </style>

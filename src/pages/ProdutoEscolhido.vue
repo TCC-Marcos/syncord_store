@@ -25,6 +25,7 @@
               <p class="q-px-xs q-mb-xs text-h4 text-weight-bolder text-green">{{ precoDesconto }}</p>
             </div>
             <p class="text-subtitle2">À vista no PIX 10% desconto</p>
+            <p>Ou até {{ parcelas }}x de {{ valorParcela }}</p>
           </q-card-section>
         </q-card>
         <div class="col-auto q-mr-md"  v-if="produtoDestaque.estoque > 0">
@@ -97,14 +98,6 @@ export default {
     const route = useRoute()
     const id = route.params.id
 
-    const precoOriginal = computed(() => {
-      return produtoDestaque.value.preco ? produtoDestaque.value.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''
-    })
-
-    const precoDesconto = computed(() => {
-      return produtoDestaque.value.preco ? (produtoDestaque.value.preco * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) : ''
-    })
-
     onMounted(() => {
       getProduto(id)
       getProdutos()
@@ -167,18 +160,46 @@ export default {
     watch(() => $q.screen.name, () => {
       pagination.value.rowsPerPage = getItemsPerPage()
     })
+
+    const precoOriginal = computed(() => {
+      return produtoDestaque.value.preco
+        ? produtoDestaque.value.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        : ''
+    })
+
+    const precoDesconto = computed(() => {
+      return produtoDestaque.value.preco
+        ? (produtoDestaque.value.preco * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        : ''
+    })
+
+    const parcelas = computed(() => {
+      return produtoDestaque.value.preco
+        ? Math.min(Math.floor(produtoDestaque.value.preco / 25), 12)
+        : 0
+    })
+
+    const valorParcela = computed(() => {
+      return produtoDestaque.value.preco
+        ? (produtoDestaque.value.preco / parcelas.value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        : ''
+    })
+
     return {
       produtos,
       produtoDestaque,
-      precoDesconto,
       addProductInCart,
-      precoOriginal,
       addCart,
 
       filter,
       pagination,
       slide: ref(1),
-      autoplay: ref(true)
+      autoplay: ref(true),
+
+      precoOriginal,
+      precoDesconto,
+      parcelas,
+      valorParcela
     }
   }
 }
