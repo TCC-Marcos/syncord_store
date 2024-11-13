@@ -16,23 +16,23 @@
             :done="step > 1"
           >
             <div class="row justify-center q-gutter-md" v-if="cart.length > 0">
-              <div class="col-7 produtos">
+              <div class="col-8 produtos">
                 <div class="row q-pa-md q-gutter-sm" v-for="produto in itensCarrinho" :key="produto.id">
                   <div class="col-md-2 col-lg-1" >
                     <q-img class="" :src="`/img/${produto.id}.jpg`" style=""/>
                   </div>
                   <div class="col-5">
                     <div class="q-ma-sm column">
-                      <strong  class="text-subtitle2 descricao">{{ produto.descricao }}</strong>
-                      <p class="q-my-xs text-caption">Preço á vista no PIX {{ ((produto.preco)*desconto).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</p>
-                      <p class="q-mb-xs text-caption">Ou {{ produto.preco.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }} em 10x sem juros</p>
+                      <strong  class="text-subtitle2 descricao">{{ produto.description }}</strong>
+                      <p class="q-my-xs text-caption">Preço á vista no PIX {{ ((produto.price)*desconto).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</p>
+                      <p class="q-mb-xs text-caption">Ou {{ produto.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }} em 10x sem juros</p>
                     </div>
                   </div>
                   <div class="col-3">
                       <div class="row justify-center">
                         <q-btn class="" @click="decrementarQtde(produto.id)" flat icon="chevron_left"/>
-                        <q-input borderless class="q-ml-sm" v-model="produto.quantidade" inputmode="numeric" mask="####" @blur="mudarQuantidade(produto.id,produto.quantidade,produto.estoque)" style="max-width: 20px;"/>
-                        <q-btn class="" @click="incrementarQtde(produto.id, produto.estoque)" flat icon="chevron_right"/>
+                        <q-input borderless class="q-ml-sm" v-model="produto.quantidade" inputmode="numeric" mask="####" @blur="mudarQuantidade(produto.id,produto.quantidade,produto.quantity)" style="max-width: 20px;"/>
+                        <q-btn class="" @click="incrementarQtde(produto.id, produto.quantity)" flat icon="chevron_right"/>
                       </div>
                       <div class="row justify-center">
                         <q-btn class="" size="10px" color="red" flat icon="delete" @click="removeProduto(produto.id)"/>
@@ -45,7 +45,7 @@
                   </div>
                   <div class="col-md-1 col-lg-2" >
                     <div class="row justify-end">
-                      <strong class="q-mt-sm">{{ (((produto.preco)*desconto)*produto.quantidade).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</strong>
+                      <strong class="q-mt-sm">{{ (((produto.price)*desconto)*produto.quantidade).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</strong>
                     </div>
                   </div>
                 </div>
@@ -150,7 +150,7 @@ export default {
       try {
         const cartIds = cart.value.map(item => item.id).join(',')
         if (cart.value.length > 0) {
-          const data = await listByIds(cartIds)
+          const data = await listByIds(cartIds.split(','))
           itensCarrinho.value = data
           itensCarrinho.value = itensCarrinho.value.map(item => {
             const produtoCarrinho = cart.value.find(prod => prod.id === item.id)
@@ -170,7 +170,7 @@ export default {
 
     const calcularPreco = () => {
       valorCarrinho.value = itensCarrinho.value.reduce((total, item) => {
-        const valor = item.quantidade * item.preco
+        const valor = item.quantidade * item.price
         return total + valor
       }, 0)
     }
@@ -183,10 +183,10 @@ export default {
     const mudarQuantidade = async (id, qtde, estoque) => {
       await setQuant(id, qtde, estoque)
       const itemInCart = itensCarrinho.value.find(o => o.id === id)
-      if (qtde <= itemInCart.estoque) {
+      if (qtde <= itemInCart.quantity) {
         itemInCart.quantidade = Number(qtde)
       } else {
-        itemInCart.quantidade = itemInCart.estoque
+        itemInCart.quantidade = itemInCart.quantity
       }
       calcularPreco()
     }
@@ -194,7 +194,7 @@ export default {
     const incrementarQtde = async (id, estoque) => {
       await increQuant(id, estoque)
       const itemInCart = itensCarrinho.value.find(o => o.id === id)
-      if (itemInCart.quantidade < itemInCart.estoque) {
+      if (itemInCart.quantidade < itemInCart.quantity) {
         itemInCart.quantidade = Number(itemInCart.quantidade) + 1
       }
       calcularPreco()

@@ -46,8 +46,8 @@
                 <q-img class="flex" :src= "`img/${props.row.id}.jpg`"/>
                 <q-card-section class="">
                   <br>
-                  <strong class="description">{{ props.row.descricao }}</strong>
-                  <h6 class="q-my-md">{{ props.row.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
+                  <strong class="description">{{ props.row.description }}</strong>
+                  <h6 class="q-my-md">{{ props.row.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
                   <p>Frete gratis</p>
                 </q-card-section>
               </q-card>
