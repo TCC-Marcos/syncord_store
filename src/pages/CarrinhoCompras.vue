@@ -16,7 +16,7 @@
             :done="step > 1"
           >
             <div class="row justify-center q-gutter-md" v-if="cart.length > 0">
-              <div class="col-8 produtos">
+              <div class="col-7 produtos">
                 <div class="row q-pa-md q-gutter-sm" v-for="produto in itensCarrinho" :key="produto.id">
                   <div class="col-md-2 col-lg-1" >
                     <q-img class="" :src="`/img/${produto.id}.jpg`" style=""/>
@@ -150,7 +150,8 @@ export default {
       try {
         const cartIds = cart.value.map(item => item.id).join(',')
         if (cart.value.length > 0) {
-          const data = await listByIds(cartIds.split(','))
+          const data = await listByIds(cartIds)
+          console.log(data)
           itensCarrinho.value = data
           itensCarrinho.value = itensCarrinho.value.map(item => {
             const produtoCarrinho = cart.value.find(prod => prod.id === item.id)

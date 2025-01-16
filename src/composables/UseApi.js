@@ -47,8 +47,16 @@ export default function useApi (url) {
   }
 
   const listByIds = async (ids) => {
+    let idParams = ''
+    for (const id of ids) {
+      if (id !== ',') {
+        idParams += `id=${id}&`
+      }
+    }
+    idParams = idParams.slice(0, -1)
+    console.log(idParams)
     try {
-      const { data } = await api.post(`${url}/findByIds`, ids)
+      const { data } = await api.get(`${url}/?${idParams}`)
       return data
     } catch (error) {
       throw new Error(error)
