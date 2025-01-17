@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row justify-center" v-if="$q.screen.gt.sm">
-      <div class="col-10 q-pa-md">
+      <div class="col-12 q-pa-md">
         <q-stepper
           v-model="step"
           flat
@@ -16,16 +16,16 @@
             :done="step > 1"
           >
             <div class="row justify-center q-gutter-md" v-if="cart.length > 0">
-              <div class="col-7 produtos">
+              <div class="col-8 produtos">
                 <div class="row q-pa-md q-gutter-sm" v-for="produto in itensCarrinho" :key="produto.id">
                   <div class="col-md-2 col-lg-1" >
                     <q-img class="" :src="`/img/${produto.id}.jpg`" style=""/>
                   </div>
-                  <div class="col-5">
+                  <div class="col-4">
                     <div class="q-ma-sm column">
                       <strong  class="text-subtitle2 descricao">{{ produto.description }}</strong>
                       <p class="q-my-xs text-caption">Preço á vista no PIX {{ ((produto.price)*desconto).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</p>
-                      <p class="q-mb-xs text-caption">Ou {{ produto.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }} em 10x sem juros</p>
+                      <p class="q-mb-xs text-caption">Ou {{ produto.price.toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }} em {{ produto.parcelas }}x sem juros</p>
                     </div>
                   </div>
                   <div class="col-3">
@@ -43,14 +43,14 @@
                       <div class="row justify-center">
                       </div>
                   </div>
-                  <div class="col-md-1 col-lg-2" >
+                  <div class="col-md-2 col-lg-2" >
                     <div class="row justify-end">
                       <strong class="q-mt-sm">{{ (((produto.price)*desconto)*produto.quantidade).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}</strong>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="col-md-4 col-lg-3 q-px-md">
+              <div class="col-md-3 col-lg-3 q-px-md">
                 <div class="row q-py-lg justify-around">
                   <div class="col-5">
                     <strong class="text-subtitle2">Valor dos produtos</strong>
@@ -156,7 +156,18 @@ export default {
           itensCarrinho.value = itensCarrinho.value.map(item => {
             const produtoCarrinho = cart.value.find(prod => prod.id === item.id)
             if (produtoCarrinho) {
-              return { ...item, quantidade: produtoCarrinho.quantidade }
+              const parcelas = item.price
+                ? Math.min(Math.floor(item.price / 50), 12)
+                : 0
+              const valorParcela = item.price
+                ? (item.price / parcelas).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                : ''
+              return {
+                ...item,
+                quantidade: produtoCarrinho.quantidade,
+                parcelas,
+                valorParcela
+              }
             }
             return item
           })

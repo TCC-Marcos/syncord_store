@@ -175,7 +175,7 @@ export default {
 
     const parcelas = computed(() => {
       return produtoDestaque.value.price
-        ? Math.min(Math.floor(produtoDestaque.value.price / 25), 12)
+        ? Math.min(Math.floor(produtoDestaque.value.price / 50), 12)
         : 0
     })
 
