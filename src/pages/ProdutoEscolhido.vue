@@ -2,15 +2,15 @@
   <div>
   <div class="q-my-xl row justify-center q-gutter-md">
     <div class="col-xs-10 col-md-4 col-lg-3">
-      <q-img :src="`/img/${produtoDestaque.id}.jpg`" />
+      <q-img :src="produtoDestaque.imagem" />
     </div>
     <div class="col-xs-11 col-md-5 col-lg-5 infoproduto">
       <div class="nomeproduto">
         <div class="row q-mx-lg">
-          <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{ produtoDestaque.description }}</p>
+          <p class="q-my-xs q-pt-lg text-h5 text-weight-regular">{{ produtoDestaque.descricao }}</p>
         </div>
         <div class="row q-mx-lg q-pb-lg q-mb-lg">
-          <p class="q-my-xs text-caption">Cod: {{ produtoDestaque.productCod }}</p>
+          <p class="q-my-xs text-caption">Cod: {{ produtoDestaque.estoque }}</p>
         </div>
       </div>
       <div class="row justify-between items-center q-pt-lg q-mt-lg">
@@ -28,12 +28,12 @@
             <p>Ou até {{ parcelas }}x de {{ valorParcela }}</p>
           </q-card-section>
         </q-card>
-        <div class="col-auto q-mr-md"  v-if="produtoDestaque.quantity > 0">
-          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" @click="addProductInCart(produtoDestaque.id, produtoDestaque.quantity)" :to="{ name: 'carrinho' }" color="primary">
+        <div class="col-auto q-mr-md"  v-if="produtoDestaque.estoque > 0">
+          <q-btn class="text-subtitle2 q-mb-md q-ml-lg" @click="addProductInCart(produtoDestaque)" :to="{ name: 'carrinho' }" color="primary">
             <q-icon name="shopping_cart" />
             Comprar
           </q-btn>
-          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addProductInCart(produtoDestaque.id, produtoDestaque.quantity)" color="primary">
+          <q-btn class="text-subtitle2 q-mb-md q-mx-md" @click="addProductInCart(produtoDestaque)" color="primary">
             <q-icon name="add_shopping_cart" />
           </q-btn>
         </div>
@@ -64,11 +64,11 @@
               <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                 <router-link :to="{ name: 'produto', params: {id: props.row.id} }">
                   <q-card flat bordered class="q-mx-md q-my-md">
-                    <q-img class="flex" :src= "`/img/${props.row.id}.jpg`"/>
+                    <q-img class="flex" :src= "props.row.imagem"/>
                     <q-card-section class="">
                       <br>
-                      <strong class="description">{{ props.row.description }}</strong>
-                      <h6 class="q-my-md">{{ props.row.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
+                      <strong class="description">{{ props.row.descricao }}</strong>
+                      <h6 class="q-my-md">{{ props.row.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
                       <p>Frete gratis</p>
                     </q-card-section>
                   </q-card>
@@ -120,6 +120,7 @@ export default {
       try {
         const data = await listById(produtoId)
         produtoDestaque.value = data
+        console.log(produtoDestaque.value)
       } catch (error) {
         console.error(error)
       }
@@ -135,10 +136,11 @@ export default {
       return 4
     }
 
-    const addProductInCart = async (produtoId, estoque) => {
+    const addProductInCart = async (produto) => {
       try {
-        const mensagem = addCart(produtoId, estoque)
-        mensagemCarrinho(mensagem)
+        addCart(produto).then(mensagem => {
+          mensagemCarrinho(mensagem)
+        })
       } catch (error) {
         console.error(error)
       }
@@ -162,31 +164,37 @@ export default {
     })
 
     const precoOriginal = computed(() => {
-      return produtoDestaque.value.price
-        ? produtoDestaque.value.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+      return produtoDestaque.value.preco
+        ? produtoDestaque.value.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
         : ''
     })
 
     const precoDesconto = computed(() => {
-      return produtoDestaque.value.price
-        ? (produtoDestaque.value.price * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+      return produtoDestaque.value.preco
+        ? (produtoDestaque.value.preco * 0.9).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
         : ''
     })
 
     const parcelas = computed(() => {
-      return produtoDestaque.value.price
-        ? Math.min(Math.floor(produtoDestaque.value.price / 25), 12)
-        : 0
+      return produtoDestaque.value.preco
+        ? Math.min(Math.floor(produtoDestaque.value.preco / 55), 12)
+        : 1
     })
 
     const valorParcela = computed(() => {
-      return produtoDestaque.value.price
-        ? (produtoDestaque.value.price / parcelas.value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-        : ''
+      if (!produtoDestaque.value.preco) return ''
+
+      return parcelas.value === 0
+        ? produtoDestaque.value.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+        : (produtoDestaque.value.preco / parcelas.value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    })
+
+    const outrosProdutos = computed(() => {
+      return produtos.value.filter(p => p.id !== produtoDestaque.value.id)
     })
 
     return {
-      produtos,
+      produtos: outrosProdutos,
       produtoDestaque,
       addProductInCart,
       addCart,

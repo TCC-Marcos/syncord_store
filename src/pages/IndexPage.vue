@@ -43,11 +43,11 @@
           <div class="q-pa-xs col-xs-12 col-sm-6 col-md-3 col-lg-2">
             <router-link :to="{name: 'produto', params: { id: props.row.id }}">
               <q-card flat bordered class="">
-                <q-img class="flex" :src= "`img/${props.row.id}.jpg`"/>
+                <q-img class="flex" :src= "props.row.imagem"/>
                 <q-card-section class="">
                   <br>
-                  <strong class="description">{{ props.row.description }}</strong>
-                  <h6 class="q-my-md">{{ props.row.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
+                  <strong class="description">{{ props.row.descricao }}</strong>
+                  <h6 class="q-my-md">{{ props.row.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}</h6>
                   <p>Frete gratis</p>
                 </q-card-section>
               </q-card>
@@ -88,6 +88,7 @@ export default defineComponent({
       try {
         const data = await list()
         produtos.value = data
+        console.log(data)
       } catch (error) {
         console.error(error)
       }

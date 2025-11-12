@@ -46,8 +46,18 @@ export default function useApi (url) {
     }
   }
 
+  const login = async (form) => {
+    try {
+      const { data } = await api.post(`${url}/login`, form)
+      return data
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
   const listByIds = async (ids) => {
     try {
+      console.log(ids)
       const { data } = await api.post(`${url}/findByIds`, ids)
       return data
     } catch (error) {
@@ -61,6 +71,7 @@ export default function useApi (url) {
     update,
     remove,
     listById,
+    login,
     listByIds
   }
 }

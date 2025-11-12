@@ -28,7 +28,7 @@ module.exports = configure(function (ctx) {
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli/boot-files
     boot: [
-
+      'pinia',
       'axios'
     ],
 
@@ -61,8 +61,8 @@ module.exports = configure(function (ctx) {
       vueRouterMode: 'history',
       env: {
         API_URL: ctx.dev
-          ? 'https://localhost:7187/'
-          : 'https://localhost:7187/'
+          ? 'https://localhost:7017/'
+          : 'https://localhost:7017/'
       } // available values: 'hash', 'history'
       // vueRouterBase,
       // vueDevtools,
