@@ -138,6 +138,7 @@ export default {
 
     const addProductInCart = async (produto) => {
       try {
+        console.log(produto)
         addCart(produto).then(mensagem => {
           mensagemCarrinho(mensagem)
         })

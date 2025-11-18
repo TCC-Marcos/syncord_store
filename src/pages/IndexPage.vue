@@ -88,7 +88,6 @@ export default defineComponent({
       try {
         const data = await list()
         produtos.value = data
-        console.log(data)
       } catch (error) {
         console.error(error)
       }

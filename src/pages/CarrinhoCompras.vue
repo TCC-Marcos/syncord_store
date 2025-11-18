@@ -135,42 +135,62 @@
 import { onMounted, ref } from 'vue'
 import { useCart } from 'src/composables/UseCart'
 import produtosService from 'src/services/produtos'
+import { useAuthStore } from 'src/stores/auth'
+import { api } from 'src/boot/axios'
+
 export default {
   setup () {
     const { cart, removeCart, increQuant, decreQuant, setQuant, clearCart } = useCart()
     const { listByIds } = produtosService()
+    const authStore = useAuthStore()
     const itensCarrinho = ref([])
     const valorCarrinho = ref(0)
+    const desconto = ref(0.9)
 
     onMounted(() => {
-      getProdutos()
+      getCarrinho()
       calcularPreco()
     })
 
-    const getProdutos = async () => {
+    const getCarrinho = async () => {
       try {
-        const cartIds = cart.value.map(item => item.id).join(',')
-        if (cart.value.length > 0) {
-          const data = await listByIds(cartIds.split(','))
-          itensCarrinho.value = data
-          itensCarrinho.value = itensCarrinho.value.map(item => {
-            const produtoCarrinho = cart.value.find(prod => prod.id === item.id)
-            if (produtoCarrinho) {
-              return { ...item, quantidade: produtoCarrinho.quantidade }
+        if (authStore.carrinhoId) {
+          // Usuário logado: busca no backend
+          const res = await api.get('/carrinho/me', {
+            headers: {
+              Authorization: `Bearer ${authStore.accessToken}`
             }
-            return item
           })
+          itensCarrinho.value = res.data.itens.map(i => ({
+            id: i.produtoId,
+            nome: i.nomeProduto,
+            descricao: i.nomeProduto,
+            preco: i.precoUnitario,
+            quantidade: i.quantidade,
+            imagem: i.imagem,
+            estoque: 100 // opcional, você pode ajustar se vier do backend
+          }))
+          // Sincroniza cart local
+          cart.value = itensCarrinho.value.map(i => ({ id: i.id, quantidade: i.quantidade }))
         } else {
-          itensCarrinho.value = []
+          // Usuário não logado: pega do storage
+          if (cart.value.length > 0) {
+            const cartIds = cart.value.map(item => item.id)
+            const data = await listByIds(cartIds)
+            itensCarrinho.value = data.map(item => {
+              const produtoCarrinho = cart.value.find(p => p.id === item.id)
+              return produtoCarrinho
+                ? { ...item, quantidade: produtoCarrinho.quantidade }
+                : item
+            })
+          } else {
+            itensCarrinho.value = []
+          }
         }
         calcularPreco()
       } catch (error) {
         console.error(error)
       }
-    }
-
-    const LimparCarrinho = () => {
-      clearCart()
     }
 
     const calcularPreco = () => {
@@ -182,49 +202,53 @@ export default {
 
     const removeProduto = async (id) => {
       await removeCart(id)
-      getProdutos()
+      await getCarrinho()
     }
 
     const mudarQuantidade = async (id, qtde, estoque) => {
       await setQuant(id, qtde, estoque)
       const itemInCart = itensCarrinho.value.find(o => o.id === id)
-      if (qtde <= itemInCart.quantity) {
-        itemInCart.quantidade = Number(qtde)
-      } else {
-        itemInCart.quantidade = itemInCart.estoque
-      }
+      if (!itemInCart) return
+      itemInCart.quantidade = Math.min(qtde, estoque)
       calcularPreco()
     }
 
     const incrementarQtde = async (id, estoque) => {
       await increQuant(id, estoque)
       const itemInCart = itensCarrinho.value.find(o => o.id === id)
-      if (itemInCart.quantidade < itemInCart.estoque) {
-        itemInCart.quantidade = Number(itemInCart.quantidade) + 1
-      }
-      calcularPreco()
-    }
-    const decrementarQtde = async (id) => {
-      await decreQuant(id)
-      const itemInCart = itensCarrinho.value.find(o => o.id === id)
-      if (itemInCart.quantidade > 1) {
-        itemInCart.quantidade = Number(itemInCart.quantidade) - 1
-      }
+      if (!itemInCart) return
+      itemInCart.quantidade = Math.min(itemInCart.quantidade + 1, estoque)
       calcularPreco()
     }
 
+    const decrementarQtde = async (id) => {
+      await decreQuant(id)
+      const itemInCart = itensCarrinho.value.find(o => o.id === id)
+      if (!itemInCart) return
+      itemInCart.quantidade = Math.max(itemInCart.quantidade - 1, 1)
+      calcularPreco()
+    }
+
+    const LimparCarrinho = async () => {
+      await clearCart()
+      await getCarrinho()
+    }
+
+    onMounted(() => {
+      getCarrinho()
+    })
+
     return {
       step: ref(1),
-      desconto: 0.9,
+      desconto,
       itensCarrinho,
-      LimparCarrinho,
+      valorCarrinho,
       cart,
-      removeCart,
-      decrementarQtde,
-      incrementarQtde,
-      mudarQuantidade,
       removeProduto,
-      valorCarrinho
+      mudarQuantidade,
+      incrementarQtde,
+      decrementarQtde,
+      LimparCarrinho
     }
   }
 }

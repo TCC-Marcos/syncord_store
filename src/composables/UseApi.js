@@ -4,7 +4,6 @@ export default function useApi (url) {
   const list = async () => {
     try {
       const { data } = await api.get(url)
-      console.log(data)
       return data
     } catch (error) {
       throw new Error(error)

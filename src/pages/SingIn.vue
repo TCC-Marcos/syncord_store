@@ -48,7 +48,12 @@ const fazerLogin = async () => {
     const res = await loginApi(dadosLogin) // { accessToken, refreshToken }
 
     // Salva tokens e marca como logado
-    authStore.login(res)
+    authStore.login(
+      res.accessToken,
+      res.refreshToken,
+      null,
+      res.carrinhoId
+    )
 
     // Redireciona para home
     router.push({ name: 'home' })
