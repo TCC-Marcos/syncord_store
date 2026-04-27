@@ -1,29 +1,77 @@
 <template>
-  <div class="container">
-    <div class="row justify-center form-row">
-      <div class="col-3 q-pa-md q-mx-lg-lg form-login">
-        <strong class="q-ml-x q-mb-md text-h5">Acesse sua conta</strong>
+  <div class="window-height window-width flex flex-center bg-grey-2">
 
-        <q-form @submit="onSubmit" class="q-pt-md q-gutter-md">
-          <q-input class="q-mt-md" outlined v-model="email" label="Usuário"/>
-          <q-input class="q-mt-md" outlined v-model="senha"
-                   :type="isPwd ? 'password' : 'text'">
-            <template v-slot:append>
-              <q-icon :name="isPwd ? 'visibility_off' : 'visibility'"
-                      class="cursor-pointer" @click="isPwd = !isPwd"/>
+    <q-card class="q-pa-md shadow-3 my-card" bordered>
+
+      <q-card-section class="text-center">
+        <q-avatar size="80px" color="primary" text-color="white" class="q-mb-sm shadow-2">
+          <q-icon name="person" />
+        </q-avatar>
+        <div class="text-h5 text-weight-bolder text-primary">Bem-vindo(a)</div>
+        <div class="text-subtitle2 text-grey-6">Acesse sua conta para continuar</div>
+      </q-card-section>
+
+      <q-card-section>
+        <q-form @submit="onSubmit" class="q-gutter-md">
+
+          <q-input
+            outlined
+            v-model="email"
+            label="E-mail ou Usuário"
+            color="primary"
+          >
+            <template v-slot:prepend>
+              <q-icon name="email" color="primary" />
             </template>
           </q-input>
-          <div class="cursor-pointer q-my-xs text-weight-light">Esqueceu a senha?</div>
 
-          <div class="row q-gutter-xs justify-end">
-            <q-btn label="Entrar" class="q-mt-lg" type="submit"
-                   style="background-color: #0597F2; color: #F2F2F2"/>
-            <q-btn label="Criar conta" class="q-mt-lg" :to="{name: 'singUp'}"
-                   style="background-color: #fff; color: #000"/>
+          <q-input
+            outlined
+            v-model="senha"
+            label="Senha"
+            :type="isPwd ? 'password' : 'text'"
+            color="primary"
+          >
+            <template v-slot:prepend>
+              <q-icon name="lock" color="primary" />
+            </template>
+            <template v-slot:append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer text-grey-6"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+          </q-input>
+
+          <div class="row justify-end">
+            <a href="#" class="text-primary text-caption" style="text-decoration: none; font-weight: 500;">
+              Esqueceu a senha?
+            </a>
           </div>
+
+          <div class="q-mt-lg">
+            <q-btn
+              unelevated
+              size="lg"
+              color="primary"
+              class="full-width text-weight-bold"
+              label="Entrar"
+              type="submit"
+            />
+            <q-btn
+              flat
+              size="md"
+              color="primary"
+              class="full-width q-mt-sm"
+              label="Criar nova conta"
+              :to="{name: 'singUp'}"
+            />
+          </div>
+
         </q-form>
-      </div>
-    </div>
+      </q-card-section>
+    </q-card>
   </div>
 </template>
 
@@ -68,18 +116,10 @@ const onSubmit = async () => {
 </script>
 
 <style lang="sass" scoped>
-.container
-  display: flex
-  justify-content: center
-  align-items: center
-  height: 80vh
-
-.form-login
-  background-color: #F2F2F2
-  border-radius: 0.5em
-
-.form-row
+/* Controla o tamanho do card para ficar bonito no PC e não quebrar no celular */
+.my-card
   width: 100%
-  @media (min-width: 1920px)
-    width: 80%
+  max-width: 420px
+  border-radius: 16px
+  background-color: #ffffff
 </style>

@@ -1,44 +1,83 @@
 <template>
   <q-layout view="hHh Lpr lff">
-    <q-header elevated style="background-color: #0583F2; color: #F2F2F2;">
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+
+    <q-header elevated class="bg-primary text-white">
+      <q-toolbar class="q-py-sm q-px-md">
+
+        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" class="q-mr-sm" />
 
         <q-toolbar-title>
-          <router-link :to="{ name: 'home' }" style="text-decoration: none; color: #F2F2F2">
-            Syncord Store
-          </router-link>
+          <router-link :to="{ name: 'home' }" class="row items-center logo-link">
+            <q-icon name="storefront" size="md" class="q-mr-sm" />
+            <span class="text-weight-bold text-h5 gt-xs">Syncord Store</span>
+            <span class="text-weight-bold text-h6 lt-sm">Syncord</span> </router-link>
         </q-toolbar-title>
 
-        <div>
-          <q-btn flat round color="#F2F2F2" icon="shopping_cart" :to="{ name: 'carrinho' }">
-            <q-badge v-if="cart.length > 0" color="red" floating>{{ cart.length }}</q-badge>
+        <div class="row items-center q-gutter-sm">
+
+          <q-btn flat dense no-caps :to="{ name: 'carrinho' }" class="q-px-sm">
+
+            <div class="relative-position row items-center">
+              <q-icon name="shopping_cart" size="sm" />
+              <q-badge
+                v-if="cart.length > 0"
+                color="negative"
+                floating
+                rounded
+                :label="cart.length"
+              />
+            </div>
+
+            <span class="q-ml-sm text-weight-medium gt-xs">Carrinho</span>
           </q-btn>
 
-          <!-- Login / User Dropdown -->
-          <q-btn v-if="!auth.isLoggedIn" flat round color="#F2F2F2" icon="person" :to="{ name: 'singIn' }" />
+          <q-separator vertical dark class="q-mx-sm gt-xs" opacity="0.3" />
 
-          <q-btn v-else flat round color="#F2F2F2" icon="person">
-            <q-menu>
-              <q-list style="min-width: 150px">
+          <q-btn v-if="!auth.isLoggedIn" flat dense no-caps :to="{ name: 'singIn' }" class="q-px-sm">
+            <q-icon name="account_circle" size="sm" />
+            <div class="column items-start q-ml-sm gt-xs" style="line-height: 1.2;">
+              <span class="text-caption text-weight-light">Olá, faça seu login</span>
+              <span class="text-weight-bold">Minha Conta</span>
+            </div>
+          </q-btn>
+
+          <q-btn v-else flat dense no-caps class="q-px-sm">
+            <q-icon name="account_circle" size="sm" />
+            <div class="column items-start q-ml-sm gt-xs" style="line-height: 1.2;">
+              <span class="text-caption text-weight-light">Bem-vindo(a)</span>
+              <span class="text-weight-bold">Meu Perfil</span>
+            </div>
+
+            <q-menu transition-show="jump-down" transition-hide="jump-up" :offset="[0, 8]">
+              <q-list style="min-width: 200px" class="q-py-sm">
+
                 <q-item clickable v-ripple :to="{ name: 'minhaConta' }">
                   <q-item-section avatar>
-                    <q-icon name="manage_accounts" />
+                    <q-avatar color="primary" text-color="white" icon="manage_accounts" size="md" />
                   </q-item-section>
-                  <q-item-section>Minha Conta</q-item-section>
+                  <q-item-section class="text-weight-medium text-grey-9">Minha Conta</q-item-section>
                 </q-item>
 
-                <q-separator />
+                <q-item clickable v-ripple :to="{ name: 'pedidos' }">
+                  <q-item-section avatar>
+                    <q-avatar color="grey-2" text-color="primary" icon="shopping_bag" size="md" />
+                  </q-item-section>
+                  <q-item-section class="text-weight-medium text-grey-9">Meus Pedidos</q-item-section>
+                </q-item>
+
+                <q-separator class="q-my-sm" />
 
                 <q-item clickable v-ripple @click="doLogout">
                   <q-item-section avatar>
-                    <q-icon name="logout" />
+                    <q-avatar color="red-1" text-color="negative" icon="logout" size="md" />
                   </q-item-section>
-                  <q-item-section>Sair</q-item-section>
+                  <q-item-section class="text-weight-medium text-negative">Sair</q-item-section>
                 </q-item>
+
               </q-list>
             </q-menu>
           </q-btn>
+
         </div>
       </q-toolbar>
     </q-header>
@@ -46,16 +85,15 @@
     <q-drawer
       v-model="leftDrawerOpen"
       overlay
-      :width="250"
-      :breakpoint="500"
+      :width="280"
+      :breakpoint="800"
       bordered
+      class="bg-white"
     >
-      <q-list>
-        <q-item-label
-          header
-        >
-        </q-item-label>
-
+      <div class="bg-primary q-pa-md text-white">
+        <div class="text-weight-bold text-h6">Navegação</div>
+      </div>
+      <q-list class="q-mt-sm">
         <EssentialLink
           v-for="link in essentialLinks"
           :key="link.title"
@@ -63,53 +101,49 @@
         />
       </q-list>
     </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
+
   </q-layout>
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue'
+<script setup>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useCart } from 'src/composables/UseCart'
 import { useAuthStore } from 'src/stores/auth'
-import { useRouter } from 'vue-router'
 import EssentialLink from 'components/EssentialLink.vue'
 
-const linksList = [
-  { title: 'Home', caption: '', icon: 'home', route: { name: 'home' } }
+// Estado da Loja e Autenticação
+const { cart } = useCart()
+const auth = useAuthStore()
+const router = useRouter()
+
+// Estado do Menu Lateral
+const leftDrawerOpen = ref(false)
+const toggleLeftDrawer = () => {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
+
+// Configuração dos Links (Pode adicionar mais itens aqui)
+const essentialLinks = [
+  { title: 'Home', caption: 'Página inicial da loja', icon: 'home', route: { name: 'home' } }
 ]
 
-export default defineComponent({
-  name: 'MainLayout',
-
-  components: {
-    EssentialLink
-  },
-
-  setup () {
-    const leftDrawerOpen = ref(false)
-    const { cart } = useCart()
-    const auth = useAuthStore()
-    const router = useRouter()
-
-    function toggleLeftDrawer () {
-      leftDrawerOpen.value = !leftDrawerOpen.value
-    }
-
-    function doLogout () {
-      auth.logout()
-      router.push('/singIn')
-    }
-
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      cart,
-      auth,
-      toggleLeftDrawer,
-      doLogout
-    }
-  }
-})
+// Função de Logout
+const doLogout = () => {
+  auth.logout()
+  router.push('/singIn')
+}
 </script>
+
+<style lang="sass" scoped>
+.logo-link
+  text-decoration: none
+  color: white
+  transition: opacity 0.2s ease
+  &:hover
+    opacity: 0.8
+</style>
