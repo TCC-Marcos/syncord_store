@@ -78,24 +78,29 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useQuasar } from 'quasar'
 import { useAuthStore } from 'src/stores/auth'
 import authService from 'src/services/auth'
 
 const router = useRouter()
+const $q = useQuasar()
 const authStore = useAuthStore()
 
 const email = ref('')
 const senha = ref('')
 const isPwd = ref(true)
 
-const { login: loginApi } = authService() // sua função que chama o backend
+const { login: loginApi } = authService()
 
 const fazerLogin = async () => {
   try {
-    const dadosLogin = { email: email.value, senha: senha.value }
-    const res = await loginApi(dadosLogin) // { accessToken, refreshToken }
+    const dadosLogin = {
+      email: email.value,
+      senha: senha.value
+    }
 
-    // Salva tokens e marca como logado
+    const res = await loginApi(dadosLogin)
+
     authStore.login(
       res.accessToken,
       res.refreshToken,
@@ -103,10 +108,31 @@ const fazerLogin = async () => {
       res.carrinhoId
     )
 
-    // Redireciona para home
     router.push({ name: 'home' })
   } catch (error) {
     console.log(error)
+
+    const status =
+      error?.response?.status ||
+      error?.status ||
+      error?.data?.statusCode
+
+    if (status === 401) {
+      $q.notify({
+        message: 'Usuário ou senha inválidos',
+        color: 'negative',
+        position: 'top',
+        icon: 'warning'
+      })
+      return
+    }
+
+    $q.notify({
+      message: 'Erro ao realizar login',
+      color: 'negative',
+      position: 'top',
+      icon: 'error'
+    })
   }
 }
 

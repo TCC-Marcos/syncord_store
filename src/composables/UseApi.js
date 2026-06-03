@@ -19,6 +19,15 @@ export default function useApi (url) {
     }
   }
 
+  const checkout = async (enderecoId) => {
+    try {
+      const { data } = await api.post(`${url}/checkout`, { enderecoId })
+      return data
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
   const update = async (form) => {
     try {
       const { data } = await api.put(`${url}/${form.id}`, form)
@@ -36,6 +45,7 @@ export default function useApi (url) {
       throw new Error(error)
     }
   }
+
   const listById = async (id) => {
     try {
       const { data } = await api.get(`${url}/${id}`)
@@ -46,18 +56,23 @@ export default function useApi (url) {
   }
 
   const login = async (form) => {
-    try {
-      const { data } = await api.post(`${url}/login`, form)
-      return data
-    } catch (error) {
-      throw new Error(error)
-    }
+    const { data } = await api.post(`${url}/login`, form)
+    return data
   }
 
   const listByIds = async (ids) => {
     try {
       console.log(ids)
       const { data } = await api.post(`${url}/findByIds`, ids)
+      return data
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+
+  const listByUserId = async () => {
+    try {
+      const { data } = await api.get(`${url}/me`)
       return data
     } catch (error) {
       throw new Error(error)
@@ -71,6 +86,8 @@ export default function useApi (url) {
     remove,
     listById,
     login,
-    listByIds
+    checkout,
+    listByIds,
+    listByUserId
   }
 }

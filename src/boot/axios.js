@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
+import { useAuthStore } from 'src/stores/auth'
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;
@@ -8,6 +9,20 @@ import axios from 'axios'
 // "export default () => {}" function below (which runs individually
 // for each client)
 const api = axios.create({ baseURL: process.env.API_URL })
+
+api.interceptors.request.use(
+  (config) => {
+    const authStore = useAuthStore()
+
+    if (authStore.accessToken) {
+      config.headers.Authorization =
+        `Bearer ${authStore.accessToken}`
+    }
+
+    return config
+  },
+  (error) => Promise.reject(error)
+)
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api

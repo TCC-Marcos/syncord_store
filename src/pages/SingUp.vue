@@ -12,7 +12,10 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form class="q-gutter-md">
+        <q-form
+        @submit.prevent="onSubmit"
+        @reset="onReset"
+        class="q-gutter-md">
 
           <div class="row q-col-gutter-md">
 
@@ -23,20 +26,35 @@
             </div>
 
             <div class="col-12 col-sm-6">
-              <q-input outlined v-model="cpf" mask="###.###.###-##" label="CPF *" color="primary">
+              <q-input outlined v-model="cpf" mask="###.###.###-##" label="CPF *" color="primary" lazy-rules :rules="[ validarCPF ]">
                 <template v-slot:prepend><q-icon name="badge" color="primary" /></template>
               </q-input>
             </div>
 
             <div class="col-12 col-sm-6">
-              <q-input outlined v-model="dtNascimento" mask="##/##/####" label="Data de nascimento" color="primary">
+              <!-- <q-input outlined v-model="dtNascimento" mask="##/##/####" label="Data de nascimento" color="primary">
                 <template v-slot:prepend><q-icon name="event" color="primary" /></template>
-              </q-input>
-            </div>
-
-            <div class="col-12 col-sm-6">
-              <q-input outlined v-model="genero" label="Gênero" color="primary">
-                <template v-slot:prepend><q-icon name="wc" color="primary" /></template>
+              </q-input> -->
+              <q-input
+                outlined
+                v-model="dtNascimento"
+                label="Data de Nascimento"
+                mask="##/##/####"
+                color="primary"
+                lazy-rules
+                :rules="[val => !!val || 'Campo obrigatório']"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="event" color="primary" class="cursor-pointer">
+                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+                        <q-date v-model="dtNascimento" mask="DD/MM/YYYY">
+                          <div class="row items-center justify-end">
+                            <q-btn v-close-popup label="Fechar" color="primary" flat />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                  </q-icon>
+                </template>
               </q-input>
             </div>
 
@@ -46,9 +64,15 @@
               </q-input>
             </div>
 
-            <div class="col-12 col-sm-6">
+            <div class="col-12 col-sm-12">
               <q-input outlined v-model="email" label="E-mail *" color="primary" type="email">
                 <template v-slot:prepend><q-icon name="email" color="primary" /></template>
+              </q-input>
+            </div>
+
+             <div class="col-12 col-sm-12">
+              <q-input outlined v-model="discordId" label="ID do Discord" color="primary" type="text">
+                <template v-slot:prepend><q-icon name="discord" color="primary" /></template>
               </q-input>
             </div>
 
@@ -112,22 +136,158 @@
   </div>
 </template>
 
-<script setup>
+<script>
+import usuariosService from 'src/services/usuarios'
 import { ref } from 'vue'
+import { useQuasar } from 'quasar'
 
-// Vínculos dos inputs
-const nome = ref('')
-const cpf = ref('')
-const dtNascimento = ref('')
-const genero = ref('')
-const telefone = ref('')
-const email = ref('')
-const password = ref('')
-const passwordConfirmar = ref('')
+export default {
+  setup () {
+    const { post } = usuariosService()
+    const $q = useQuasar()
 
-// Controle de visibilidade das senhas
-const isPwd = ref(true)
-const isPwdConfirm = ref(true)
+    // Campos do formulário
+    const nome = ref(null)
+    const cpf = ref(null)
+    const dtNascimento = ref(null)
+    const genero = ref(null)
+    const telefone = ref(null)
+    const email = ref(null)
+    const discordId = ref(null)
+    const password = ref(null)
+    const passwordConfirmar = ref(null)
+
+    // Controle de visibilidade das senhas
+    const isPwd = ref(true)
+    const isPwdConfirm = ref(true)
+
+    function validarCPF (val) {
+      if (!val) return 'Campo obrigatório'
+
+      const cpfLimpo = val.replace(/\D/g, '')
+
+      if (cpfLimpo.length !== 11) return 'CPF inválido'
+      if (/^(\d)\1{10}$/.test(cpfLimpo)) return 'CPF inválido'
+
+      let soma = 0
+      let resto
+
+      // Primeiro dígito
+      for (let i = 1; i <= 9; i++) {
+        soma += parseInt(cpfLimpo.substring(i - 1, i)) * (11 - i)
+      }
+
+      resto = (soma * 10) % 11
+      if (resto === 10 || resto === 11) resto = 0
+
+      if (resto !== parseInt(cpfLimpo.substring(9, 10))) {
+        return 'CPF inválido'
+      }
+
+      // Segundo dígito
+      soma = 0
+
+      for (let i = 1; i <= 10; i++) {
+        soma += parseInt(cpfLimpo.substring(i - 1, i)) * (12 - i)
+      }
+
+      resto = (soma * 10) % 11
+      if (resto === 10 || resto === 11) resto = 0
+
+      if (resto !== parseInt(cpfLimpo.substring(10, 11))) {
+        return 'CPF inválido'
+      }
+
+      return true
+    }
+
+    function onlyDigits (str) {
+      return String(str || '').replace(/\D+/g, '')
+    }
+
+    function formatDateToIsoDateOnly (value) {
+      if (!value) return null
+
+      const [day, month, year] = value.split('/')
+
+      if (!day || !month || !year) return value
+
+      return `${year}-${month}-${day}`
+    }
+
+    const cadastroUsuarios = async () => {
+      try {
+        const usuario = {
+          nome: nome.value,
+          cpf: onlyDigits(cpf.value),
+          dataNascimento: formatDateToIsoDateOnly(dtNascimento.value),
+          telefone: onlyDigits(telefone.value),
+          email: email.value,
+          discordId: discordId.value,
+          senha: password.value
+        }
+
+        await post(usuario)
+
+        $q.notify({
+          message: 'Usuário cadastrado com sucesso!',
+          color: 'positive'
+        })
+
+        onReset()
+      } catch (error) {
+        console.error(error)
+
+        $q.notify({
+          message: 'Erro ao cadastrar usuário',
+          color: 'negative'
+        })
+      }
+    }
+
+    const onSubmit = async () => {
+      if (password.value !== passwordConfirmar.value) {
+        $q.notify({
+          message: 'As senhas não são iguais',
+          color: 'negative'
+        })
+        return
+      }
+
+      await cadastroUsuarios()
+    }
+
+    const onReset = () => {
+      nome.value = null
+      cpf.value = null
+      dtNascimento.value = null
+      genero.value = null
+      telefone.value = null
+      email.value = null
+      discordId.value = null
+      password.value = null
+      passwordConfirmar.value = null
+    }
+
+    return {
+      nome,
+      cpf,
+      dtNascimento,
+      genero,
+      telefone,
+      email,
+      discordId,
+      password,
+      passwordConfirmar,
+      isPwd,
+      isPwdConfirm,
+      validarCPF,
+      cadastroUsuarios,
+      onSubmit,
+      onReset
+    }
+  }
+}
 </script>
 
 <style lang="sass" scoped>

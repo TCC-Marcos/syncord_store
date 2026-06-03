@@ -19,13 +19,6 @@
 
             <div class="relative-position row items-center">
               <q-icon name="shopping_cart" size="sm" />
-              <q-badge
-                v-if="cart.length > 0"
-                color="negative"
-                floating
-                rounded
-                :label="cart.length"
-              />
             </div>
 
             <span class="q-ml-sm text-weight-medium gt-xs">Carrinho</span>
@@ -112,12 +105,12 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useCart } from 'src/composables/UseCart'
+// import { useCart } from 'src/composables/UseCart'
 import { useAuthStore } from 'src/stores/auth'
 import EssentialLink from 'components/EssentialLink.vue'
 
 // Estado da Loja e Autenticação
-const { cart } = useCart()
+// const { cart } = useCart()
 const auth = useAuthStore()
 const router = useRouter()
 

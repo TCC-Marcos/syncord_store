@@ -85,7 +85,7 @@
                   size="lg"
                   class="full-width text-weight-bold q-mb-sm"
                   label="Continuar para Entrega"
-                  @click="$refs.stepper.next()"
+                  @click="irParaEntrega"
                 />
                 <q-btn
                   flat
@@ -107,57 +107,151 @@
 
         <q-step :name="2" title="Entrega" icon="local_shipping" :done="step > 2">
           <div class="row q-col-gutter-md">
-            <div class="col-12 col-md-8">
-              <q-card flat bordered class="q-pa-md bg-white rounded-borders">
-                <div class="text-h6 q-mb-md text-grey-9">Endereço de Entrega</div>
 
-                <q-form class="row q-col-gutter-sm">
-                  <div class="col-12 col-sm-4">
-                    <q-input outlined v-model="endereco.cep" label="CEP *" mask="#####-###" color="primary" />
+            <div class="col-12 col-md-8">
+              <q-card flat bordered class="bg-white rounded-borders q-pa-md">
+
+                <div class="row items-center justify-between q-mb-md">
+                  <div class="text-h6">
+                    Escolha o endereço de entrega
                   </div>
-                  <div class="col-12 col-sm-8">
-                    <q-input outlined v-model="endereco.rua" label="Rua / Avenida *" color="primary" />
+
+                  <q-btn
+                    color="primary"
+                    icon="add"
+                    label="Novo endereço"
+                    @click="dialogEndereco = true"
+                  />
+                </div>
+
+                <q-separator class="q-mb-md" />
+
+                <div v-if="enderecos.length">
+
+                  <q-card
+                    v-for="endereco in enderecos"
+                    :key="endereco.id"
+                    flat
+                    bordered
+                    class="q-mb-sm cursor-pointer"
+                    :class="{
+                      'border-primary': enderecoSelecionado?.id === endereco.id
+                    }"
+                    @click="enderecoSelecionado = endereco"
+                  >
+                    <q-card-section>
+                      <div class="row items-start">
+
+                        <div class="col-auto">
+                          <q-radio
+                            :model-value="enderecoSelecionado?.id"
+                            :val="endereco.id"
+                            @update:model-value="enderecoSelecionado = endereco"
+                          />
+                        </div>
+
+                        <div class="col">
+                          <div class="text-subtitle1 text-weight-bold">
+                            {{ endereco.titulo }}
+                          </div>
+
+                          <div>
+                            {{ endereco.rua }}, {{ endereco.numero }}
+                          </div>
+
+                          <div v-if="endereco.complemento">
+                            {{ endereco.complemento }}
+                          </div>
+
+                          <div>
+                            {{ endereco.bairro }}
+                          </div>
+
+                          <div>
+                            {{ endereco.cidade }} - {{ endereco.estado }}
+                          </div>
+
+                          <div>
+                            CEP: {{ endereco.cep }}
+                          </div>
+                        </div>
+
+                      </div>
+                    </q-card-section>
+                  </q-card>
+
+                </div>
+
+                <div v-else class="text-center q-py-xl">
+                  <q-icon
+                    name="location_off"
+                    size="60px"
+                    color="grey-5"
+                  />
+
+                  <div class="text-grey-7 q-mt-md">
+                    Nenhum endereço cadastrado.
                   </div>
-                  <div class="col-12 col-sm-4">
-                    <q-input outlined v-model="endereco.numero" label="Número *" color="primary" />
-                  </div>
-                  <div class="col-12 col-sm-4">
-                    <q-input outlined v-model="endereco.complemento" label="Complemento" color="primary" />
-                  </div>
-                  <div class="col-12 col-sm-4">
-                    <q-input outlined v-model="endereco.bairro" label="Bairro *" color="primary" />
-                  </div>
-                  <div class="col-12 col-sm-8">
-                    <q-input outlined v-model="endereco.cidade" label="Cidade *" color="primary" />
-                  </div>
-                  <div class="col-12 col-sm-4">
-                    <q-select outlined v-model="endereco.estado" :options="estados" label="Estado *" color="primary" />
-                  </div>
-                </q-form>
+
+                  <q-btn
+                    class="q-mt-md"
+                    color="primary"
+                    icon="add"
+                    label="Cadastrar endereço"
+                    @click="dialogEndereco = true"
+                  />
+                </div>
+
               </q-card>
             </div>
 
             <div class="col-12 col-md-4">
               <q-card flat bordered class="bg-white rounded-borders q-pa-md">
+
                 <div class="row justify-between items-center q-mb-md">
-                  <span class="text-h6 text-weight-bold text-grey-9">Total</span>
+                  <span class="text-h6 text-weight-bold">
+                    Total
+                  </span>
+
                   <span class="text-h5 text-weight-bolder text-primary">
-                    {{ (valorCarrinho * desconto).toLocaleString('pt-BR', {style: 'currency', currency: 'BRL'}) }}
+                    {{ (valorCarrinho * desconto).toLocaleString(
+                      'pt-BR',
+                      {
+                        style: 'currency',
+                        currency: 'BRL'
+                      }
+                    ) }}
                   </span>
                 </div>
+
                 <div class="row q-col-gutter-sm">
                   <div class="col-6">
-                    <q-btn outline color="primary" class="full-width" label="Voltar" @click="$refs.stepper.previous()" />
+                    <q-btn
+                      outline
+                      color="primary"
+                      class="full-width"
+                      label="Voltar"
+                      @click="$refs.stepper.previous()"
+                    />
                   </div>
+
                   <div class="col-6">
-                    <q-btn unelevated color="primary" class="full-width text-weight-bold" label="Ir p/ Pagamento" @click="$refs.stepper.next()" />
+                    <q-btn
+                      unelevated
+                      color="primary"
+                      class="full-width text-weight-bold"
+                      label="Ir p/ Pagamento"
+                      :disable="!enderecoSelecionado"
+                      @click="$refs.stepper.next()"
+                    />
                   </div>
                 </div>
+
               </q-card>
             </div>
+
           </div>
         </q-step>
-
         <q-step :name="3" title="Pagamento" icon="credit_card" :done="step > 3">
           <div class="row q-col-gutter-md">
             <div class="col-12 col-md-8">
@@ -250,10 +344,14 @@
         <q-step :name="4" title="Concluído" icon="check" class="text-center q-py-xl">
           <q-icon name="check_circle" color="positive" size="120px" />
           <h4 class="text-weight-bold text-grey-9 q-mt-md q-mb-sm">Compra Realizada!</h4>
-          <p class="text-h6 text-grey-7 q-mb-xl">Seu pedido <strong>#SYNC{{ Math.floor(Math.random() * 100000) }}</strong> foi processado com sucesso.</p>
+          <p class="text-h6 text-grey-7 q-mb-xl">
+            Seu pedido
+            <strong>#{{ pedidoCriado?.numeroPedido }}</strong>
+            foi processado com sucesso.
+          </p>
 
           <div class="row justify-center q-gutter-md">
-            <q-btn outline color="primary" size="lg" label="Meus Pedidos" />
+            <q-btn outline color="primary" size="lg" label="Meus Pedidos" :to="{ name: 'meusPedidos' }" />
             <q-btn unelevated color="primary" size="lg" label="Voltar para a Loja" :to="{ name: 'home' }" />
           </div>
         </q-step>
@@ -263,20 +361,123 @@
         </template>
 
       </q-stepper>
+      <q-dialog v-model="dialogEndereco" persistent>
+        <q-card style="width: 700px; max-width: 95vw">
+
+          <q-card-section>
+            <div class="text-h6">
+              Novo endereço
+            </div>
+          </q-card-section>
+
+          <q-card-section>
+            <div class="row q-col-gutter-sm">
+
+              <div class="col-12">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.titulo"
+                  label="Título"
+                />
+              </div>
+
+              <div class="col-4">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.cep"
+                  label="CEP"
+                  mask="#####-###"
+                />
+              </div>
+
+              <div class="col-8">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.rua"
+                  label="Rua"
+                />
+              </div>
+
+              <div class="col-4">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.numero"
+                  label="Número"
+                />
+              </div>
+
+              <div class="col-8">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.complemento"
+                  label="Complemento"
+                />
+              </div>
+
+              <div class="col-12">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.bairro"
+                  label="Bairro"
+                />
+              </div>
+
+              <div class="col-8">
+                <q-input
+                  outlined
+                  v-model="novoEndereco.cidade"
+                  label="Cidade"
+                />
+              </div>
+
+              <div class="col-4">
+                <q-select
+                  outlined
+                  v-model="novoEndereco.estado"
+                  :options="estados"
+                  label="Estado"
+                />
+              </div>
+
+            </div>
+          </q-card-section>
+
+          <q-card-actions align="right">
+            <q-btn
+              flat
+              label="Cancelar"
+              v-close-popup
+            />
+
+            <q-btn
+              color="primary"
+              label="Salvar"
+              @click="salvarEndereco"
+            />
+          </q-card-actions>
+
+        </q-card>
+      </q-dialog>
     </div>
   </div>
 </template>
 
 <script setup>
 import { onMounted, ref, computed } from 'vue'
+import { useRouter } from 'vue-router' // 1. Adicionado import do Vue Router
 import { useCart } from 'src/composables/UseCart'
 import produtosService from 'src/services/produtos'
+import enderecosService from 'src/services/enderecos'
+import pedidosService from 'src/services/pedidos'
 import { useAuthStore } from 'src/stores/auth'
 import { api } from 'src/boot/axios'
 
-// --- CARRINHO LOGIC ---
+// --- SETUP ---
+const router = useRouter() // 2. Instanciando o router
 const { cart, removeCart, increQuant, decreQuant, clearCart } = useCart()
 const { listByIds } = produtosService()
+const { listByUserId, post } = enderecosService()
+const { checkout } = pedidosService()
 const authStore = useAuthStore()
 
 const step = ref(1)
@@ -285,10 +486,10 @@ const itensCarrinho = ref([])
 const valorCarrinho = ref(0)
 const desconto = ref(0.9)
 
-// --- NOVOS DADOS: ENDEREÇO E PAGAMENTO ---
-const endereco = ref({
-  cep: '', rua: '', numero: '', complemento: '', bairro: '', cidade: '', estado: null
-})
+// --- DADOS: ENDEREÇO E PAGAMENTO ---
+// const endereco = ref({
+//   cep: '', rua: '', numero: '', complemento: '', bairro: '', cidade: '', estado: null
+// })
 const estados = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO']
 
 const formaPagamento = ref('pix')
@@ -296,7 +497,22 @@ const cartao = ref({
   numero: '', nome: '', validade: '', cvv: '', parcelas: null
 })
 
-// Simula opções de parcelamento baseadas no valor do carrinho
+const enderecos = ref([])
+const enderecoSelecionado = ref(null)
+
+const dialogEndereco = ref(false)
+
+const novoEndereco = ref({
+  titulo: '',
+  cep: '',
+  rua: '',
+  numero: '',
+  complemento: '',
+  bairro: '',
+  cidade: '',
+  estado: null
+})
+
 const opcoesParcelamento = computed(() => {
   const opções = []
   for (let i = 1; i <= 10; i++) {
@@ -370,16 +586,80 @@ const LimparCarrinho = async () => {
   await getCarrinho()
 }
 
-// --- NOVO MÉTODO: FINALIZAR COMPRA ---
-const finalizarCompra = async () => {
-  // Aqui você enviaria os dados (itens, endereco, pagamento) para a sua API de pedidos
-  // Simulando sucesso e avançando para a última tela
-  await clearCart() // Limpa o carrinho após comprar
-  step.value = 4
+// --- NOVOS MÉTODOS DE FLUXO ---
+
+// 3. Nova função que valida o login antes de avançar
+const irParaEntrega = () => {
+  // Verifica se o usuário está logado usando a existência do token
+  // (Adapte 'accessToken' caso a sua store use outra propriedade, como 'isAuthenticated')
+  if (!authStore.isLoggedIn) {
+    router.push({ name: 'singIn' })
+  } else {
+    stepper.value.next()
+  }
 }
 
-onMounted(() => {
-  getCarrinho()
+const carregarEnderecos = async () => {
+  try {
+    const data = await listByUserId(authStore.accessToken)
+
+    enderecos.value = data
+
+    if (data.length > 0 && !enderecoSelecionado.value) {
+      enderecoSelecionado.value = data[0]
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const salvarEndereco = async () => {
+  try {
+    await post(novoEndereco.value)
+
+    dialogEndereco.value = false
+
+    novoEndereco.value = {
+      titulo: '',
+      cep: '',
+      rua: '',
+      numero: '',
+      complemento: '',
+      bairro: '',
+      cidade: '',
+      estado: null
+    }
+
+    await carregarEnderecos()
+
+    enderecoSelecionado.value =
+      enderecos.value[enderecos.value.length - 1]
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const pedidoCriado = ref(null)
+
+const finalizarCompra = async () => {
+  try {
+    pedidoCriado.value =
+      await checkout(enderecoSelecionado.value.id)
+
+    await clearCart()
+
+    step.value = 4
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(async () => {
+  await getCarrinho()
+
+  if (authStore.isLoggedIn) {
+    await carregarEnderecos()
+  }
 })
 </script>
 
