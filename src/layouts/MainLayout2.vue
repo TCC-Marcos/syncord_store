@@ -51,7 +51,7 @@
                   <q-item-section class="text-weight-medium text-grey-9">Minha Conta</q-item-section>
                 </q-item>
 
-                <q-item clickable v-ripple :to="{ name: 'pedidos' }">
+                <q-item clickable v-ripple :to="{ name: 'meusPedidos' }">
                   <q-item-section avatar>
                     <q-avatar color="grey-2" text-color="primary" icon="shopping_bag" size="md" />
                   </q-item-section>

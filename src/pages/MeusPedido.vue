@@ -2,6 +2,12 @@
   <q-page class="q-pa-md bg-grey-2">
     <div class="column q-gutter-y-lg">
 
+      <div>
+        <h1 class="text-h4 text-weight-bold text-primary q-mb-md">
+          Meus Pedidos
+        </h1>
+      </div>
+
       <q-card
         v-for="pedido in pedidos"
         :key="pedido.id"
